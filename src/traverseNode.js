@@ -8,10 +8,10 @@ const VISTOR_KEYS = {
   'oneOf': 'oneOf'
 };
 
-export default function traverseNode(node, opts) {
+export default function traverseNode(node, opts, state, parentPath) {
   const key = VISTOR_KEYS[nodeType(node)];
   if (key) {
-    const ctx = new Context(opts);
+    const ctx = new Context(opts, state, parentPath);
     ctx.visit(node, key);
   }
   return;

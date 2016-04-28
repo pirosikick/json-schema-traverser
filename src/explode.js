@@ -9,23 +9,28 @@
  *    }
  */
 export default function explode(opts) {
+  opts = Object.assign({}, opts);
   opts = correctOpt(opts);
-  return Object.keys(opts)
-  .filter(key => !/^(enter|exit)$/.test(key))
-  .reduce((newOpts, key) => {
-    const value = correctOpt(opts[key]);
-    if (value.exit || value.enter) {
-      key.split('|').filter(k => !!k).forEach(key => {
-        newOpts[key] = value;
-      });
-    }
-    return newOpts;
-  }, {});
+
+  Object.keys(opts)
+    .filter(key => !/^(enter|exit)$/.test(key))
+    .forEach(key => {
+      const value = correctOpt(opts[key]);
+      // "object|string": { ... }
+      if (/\w\|\w/.test(key)) {
+        key.split('|').forEach(key => opts[key] = value);
+        delete opts[key];
+      } else {
+        opts[key] = value;
+      }
+    });
+
+  return opts;
 };
 
 /**
  * function () {} => { enter: function () {} }
- * { enter: 'not function' } => {}
+ * { enter: 'not function' } => false
  */
 function correctOpt(opt) {
   if (typeof opt === 'function') {
@@ -34,11 +39,7 @@ function correctOpt(opt) {
     return {};
   }
 
-  ['enter', 'exit'].forEach(key => {
-    if (opt[key] && typeof opt[key] !== 'function') {
-      delete opt[key]
-    }
-  });
-
+  if (typeof opt.enter !== 'function') delete opt.enter;
+  if (typeof opt.exit !== 'function') delete opt.exit;
   return opt;
 }
