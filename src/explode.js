@@ -9,15 +9,36 @@
  *    }
  */
 export default function explode(opts) {
-  const newOpts = {};
-  Object.keys(opts).forEach(key => {
-    let value = opts[key];
-    if (typeof value === 'function') {
-      value = { enter: value };
+  opts = correctOpt(opts);
+  return Object.keys(opts)
+  .filter(key => !/^(enter|exit)$/.test(key))
+  .reduce((newOpts, key) => {
+    const value = correctOpt(opts[key]);
+    if (value.exit || value.enter) {
+      key.split('|').filter(k => !!k).forEach(key => {
+        newOpts[key] = value;
+      });
     }
-    key.split('|').filter(k => !!k).forEach(key => {
-      newOpts[key] = value;
-    });
-  });
-  return newOpts;
+    return newOpts;
+  }, {});
 };
+
+/**
+ * function () {} => { enter: function () {} }
+ * { enter: 'not function' } => {}
+ */
+function correctOpt(opt) {
+  if (typeof opt === 'function') {
+    return { enter: opt };
+  } else if (typeof opt !== 'object') {
+    return {};
+  }
+
+  ['enter', 'exit'].forEach(key => {
+    if (opt[key] && typeof opt[key] !== 'function') {
+      delete opt[key]
+    }
+  });
+
+  return opt;
+}
