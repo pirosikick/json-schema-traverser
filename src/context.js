@@ -1,3 +1,4 @@
+import nodeType from './nodeType';
 import NodePath from './path';
 
 export default class Context {
@@ -29,18 +30,21 @@ export default class Context {
   }
 
   visitSingle(parent, key) {
+    const node = parent[key];
+    if (!this.shouldVisit(node)) return;
     const path = new NodePath({
       opts: this.opts,
       parent,
       container: parent,
-      node: parent[key],
-      key: key,
+      node,
+      key: key
     });
     path.visit();
   }
 
   visitArray(container, parent, listKey) {
     container.forEach((node, key) => {
+      if (!this.shouldVisit(node)) return;
       const path = new NodePath({
         opts: this.opts,
         parent,
@@ -55,11 +59,13 @@ export default class Context {
 
   visitProperties(container, parent, listKey) {
     Object.keys(container).forEach(key => {
+      const node = container[key];
+      if (!this.shouldVisit(node)) return;
       const path = new NodePath({
         opts: this.opts,
         parent,
         container,
-        node: container[key],
+        node,
         key,
         listKey
       });
