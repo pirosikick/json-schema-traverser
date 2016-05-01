@@ -2,34 +2,22 @@ import test from 'ava';
 import NodePath from '../lib/path';
 
 test('path.visit()', t => {
-  t.plan(4);
-  const schema = { type: 'object', properties: {} };
-  const path = new NodePath(schema, {
-    enter(path) { t.is(path.node, schema); },
-    exit(path) { t.is(path.node, schema); },
+  t.plan(3 * 4);
+  const node = { type: 'object', properties: {} };
+  const state = {};
+  const callback = function (path, _state) {
+    t.is(_state, state);
+    t.is(this, state);
+    t.is(path.node, node);
+  };
+  const opts = {
+    enter: callback,
+    exit: callback,
     object: {
-      enter(path) { t.is(path.node, schema); },
-      exit(path) { t.is(path.node, schema); }
-    }
-  });
-  path.visit();
-});
-
-test('check fields of the path', t => {
-  t.plan(4);
-  const schema = {
-    type: 'object',
-    properties: {
-      hoge: { type: 'string' }
+      enter: callback,
+      exit: callback
     }
   };
-  const path = new NodePath(schema, {
-    string(path) {
-      t.is(path.parent, schema);
-      t.is(path.container, schema.properties);
-      t.is(path.key, 'hoge');
-      t.is(path.listKey, 'properties');
-    }
-  });
+  const path = new NodePath({ node, opts, state });
   path.visit();
 });

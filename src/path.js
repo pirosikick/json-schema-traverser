@@ -33,11 +33,11 @@ export default class NodePath {
 
   call(key) {
     if (isFunction(this.opts[key])) {
-      this.opts[key](this);
+      this.opts[key].call(this.state, this, this.state);
     }
     const type = this.nodeType;
     if (this.opts[type] && isFunction(this.opts[type][key])) {
-      this.opts[type][key](this);
+      this.opts[type][key].call(this.state, this, this.state);
     }
   }
 }
