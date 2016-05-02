@@ -1,6 +1,6 @@
 {
   "name": "json-schema-traverser",
-  "description": "",
+  "description": "Traverse JSON Schema",
   "version": "0.0.1",
   "author": "Hiroyuki ANAI <pirosikick@gmail.com>",
   "bug": "https://github.com/pirosikick/json-schema-traverser/issues",
@@ -36,5 +36,8 @@
     "lint": "eslint src test",
     "test": "gulp test",
     "start": "gulp"
+  },
+  "dependencies": {
+    "jsonschema": "^1.1.0"
   }
 }
